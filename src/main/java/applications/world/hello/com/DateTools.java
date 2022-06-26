@@ -7,54 +7,43 @@ import java.util.TimeZone;
 
 public class DateTools {
 
-    protected final SimpleDateFormat dateFormat;
-
+    private final SimpleDateFormat datePattern;
+    private static final String DEFAULT_DATE_PATTERN = "MM/dd/yyyy hh:mm:ss";
 
     /**
-     * Default constructor.  Automatically assigns the SimpleDateFormat pattern to "MM/dd/yyyy".
+     * Automatically assigns the SimpleDateFormat pattern to "MM/dd/yyyy" and Time Zone to
+     * "Greenwich Mean Time".
      */
     public DateTools() {
-        this("MM/dd/yyyy", TimeZone.getTimeZone("Greenwich Mean Time"));
+        this(DEFAULT_DATE_PATTERN, TimeZone.getTimeZone("Greenwich Mean Time"));
     }
 
     /**
-     *
-     * @param dateFormat SimpleDateFormat pattern for String to Date conversion.
+     * Automatically assigns the Time Zone to "Greenwich Mean Time".
+     * @param datePattern SimpleDateFormat pattern for String to Date conversion.
      */
-    public DateTools(String dateFormat) {
-        this(dateFormat, TimeZone.getTimeZone("Greenwich Mean Time"));
+    public DateTools(String datePattern) {
+        this(datePattern, TimeZone.getTimeZone("Greenwich Mean Time"));
     }
 
     /**
+     * Automatically assigns the SimpleDateFormat pattern to "MM/dd/yyyy".
      *
      * @param timeZone Assigns the time zone to base calculations in.
      */
     public DateTools(TimeZone timeZone) {
-        this("MM/dd/yyyy", timeZone);
+        this(DEFAULT_DATE_PATTERN, timeZone);
     }
 
     /**
      *
-     * @param dateFormat SimpleDateFormat string describing the format for Date and Time conversions.
+     * @param datePattern SimpleDateFormat string describing the format for Date and Time conversions.
      * @param timeZone Assigns the time zone to base calculations in.
      */
-    public DateTools(String dateFormat, TimeZone timeZone) {
-        this.dateFormat = new SimpleDateFormat(dateFormat);
-        this.dateFormat.setTimeZone(timeZone);
-    }
-
-    /**
-     * Converts a Date String to a Date value.  Returns null on failure.
-     * @param dateString Date to be converted.
-     * @return Date object assigned to the date provided.
-     */
-    public Date convertStringToDate(String dateString) {
-        try {
-            return dateFormat.parse(dateString);
-        }
-        catch (ParseException ex) {
-            return null;
-        }
+    public DateTools(String datePattern, TimeZone timeZone) {
+        if (timeZone == null) throw new NullPointerException("TimeZone Object is null.");
+        this.datePattern = new SimpleDateFormat(datePattern);
+        this.datePattern.setTimeZone(timeZone);
     }
 
     /**
@@ -62,7 +51,15 @@ public class DateTools {
      * @return Date object assigned to the Date and Time of dateString.
      */
     public String getSimpleDateFormatPattern() {
-        return dateFormat.toLocalizedPattern();
+        return datePattern.toLocalizedPattern();
+    }
+
+    /**
+     *
+     * @return The default date pattern.
+     */
+    public String getDefaultDatePattern() {
+        return DEFAULT_DATE_PATTERN;
     }
 
     /**
@@ -70,7 +67,7 @@ public class DateTools {
      * @return Display Name of the current Time Zone.
      */
     public String getTimeZoneDisplayName() {
-        return dateFormat.getTimeZone().getDisplayName();
+        return datePattern.getTimeZone().getDisplayName();
     }
 
     /**
@@ -79,6 +76,16 @@ public class DateTools {
      * @return Date and Time contained in the supplied Date Object formatted with the SimpleDateFormat assigned.
      */
     public String convertDateToStringFormat(Date date) {
-        return dateFormat.format(date);
+        return datePattern.format(date);
     }
+
+    /**
+     * Converts a Date String to a Date value.  Returns ParseException on failure.
+     * @param dateString Date to be converted.
+     * @return Date object assigned to the date provided or null on failure.
+     */
+    public Date convertStringToDate(String dateString) throws ParseException {
+        return datePattern.parse(dateString);
+    }
+
 }
